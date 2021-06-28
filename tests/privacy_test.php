@@ -15,10 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the language condition.
+ * Unit tests for the auth condition.
  *
- * @package   availability_language
+ * @package   availability_auth
  * @copyright 2018 Renaat Debleu <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,22 +28,23 @@ defined('MOODLE_INTERNAL') || die();
 use \core_privacy\tests\provider_testcase;
 
 /**
- * Unit tests for the language condition.
+ * Unit tests for the auth condition.
  *
- * @package   availability_language
+ * @package   availability_auth
  * @copyright 2018 Renaat Debleu <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class availability_language_privacy_testcase extends provider_testcase {
+class availability_auth_privacy_testcase extends provider_testcase {
 
     /**
      * Test returning metadata.
-     * @coversDefaultClass availability_language\privacy\provider
+     * @coversDefaultClass availability_auth\privacy\provider
      */
     public function test_get_metadata() {
-        $collection = new \core_privacy\local\metadata\collection('availability_language');
-        $reason = \availability_language\privacy\provider::get_reason($collection);
+        $collection = new \core_privacy\local\metadata\collection('availability_auth');
+        $reason = \availability_auth\privacy\provider::get_reason($collection);
         $this->assertEquals($reason, 'privacy:metadata');
-        $this->assertStringContainsString('does not store', get_string($reason, 'availability_language'));
+        $this->assertStringContainsString('does not store', get_string($reason, 'availability_auth'));
     }
 }

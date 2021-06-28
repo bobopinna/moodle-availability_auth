@@ -17,15 +17,16 @@
 /**
  * Version info.
  *
- * @package availability_language
+ * @package availability_auth
  * @copyright 2018 Renaat Debleu <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021060600;
-$plugin->requires  = 2020061500;
-$plugin->component = 'availability_language';
+$plugin->version   = 2021062801;
+$plugin->requires  = 2018051700.00;
+$plugin->component = 'availability_auth';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '3.9+';
+$plugin->release   = '1.0';

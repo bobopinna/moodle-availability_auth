@@ -29,7 +29,7 @@
 
 
     <testsuites>
-        <testsuite name="availability_language_testsuite">
+        <testsuite name="availability_auth_testsuite">
             <directory suffix="_test.php">.</directory>
         </testsuite>
     </testsuites>

@@ -17,26 +17,28 @@
 /**
  * Condition main class.
  *
- * @package availability_language
+ * @package availability_auth
  * @copyright 2018 Renaat Debleu <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace availability_language;
+namespace availability_auth;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * Condition main class.
  *
- * @package availability_language
+ * @package availability_auth
  * @copyright 2018 Renaat Debleu <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class condition extends \core_availability\condition {
 
-    /** @var string ID of language that this condition requires, or '' = any language */
-    protected $languageid;
+    /** @var string of authentication that this condition requires, or '' = any authentication */
+    protected $auth;
 
     /**
      * Constructor.
@@ -45,13 +47,13 @@ class condition extends \core_availability\condition {
      * @throws \coding_exception If invalid data structure.
      */
     public function __construct($structure) {
-        // Get language id.
+        // Get auth.
         if (!property_exists($structure, 'id')) {
-            $this->languageid = '';
+            $this->auth = '';
         } else if (is_string($structure->id)) {
-            $this->languageid = $structure->id;
+            $this->auth = $structure->id;
         } else {
-            throw new \coding_exception('Invalid ->id for language condition');
+            throw new \coding_exception('Invalid ->id for authentication condition');
         }
     }
 
@@ -61,9 +63,9 @@ class condition extends \core_availability\condition {
      * @return \stdClass Structure object
      */
     public function save() {
-        $result = (object)['type' => 'language'];
-        if ($this->languageid) {
-            $result->id = $this->languageid;
+        $result = (object)['type' => 'auth'];
+        if ($this->auth) {
+            $result->id = $this->auth;
         }
         return $result;
     }
@@ -74,11 +76,11 @@ class condition extends \core_availability\condition {
      * Intended for unit testing, as normally the JSON values are constructed
      * by JavaScript code.
      *
-     * @param string $languageid Not required language
+     * @param string $auth Not required authentication
      * @return stdClass Object representing condition
      */
-    public static function get_json($languageid = '') {
-        return (object)['type' => 'language', 'id' => $languageid];
+    public static function get_json($auth = '') {
+        return (object)['type' => 'auth', 'id' => $auth];
     }
 
     /**
@@ -96,29 +98,21 @@ class condition extends \core_availability\condition {
     public function is_available($not, \core_availability\info $info, $grabthelot, $userid) {
         global $CFG, $DB, $USER;
 
-        // If course has forced language.
-        $course = $info->get_course();
         $allow = false;
-        if (isset($course->lang) && $course->lang == $this->languageid) {
-            $allow = true;
-        }
+        $userauth = 'manual';
         if ($userid == $USER->id) {
-            // Checking the language of the currently logged in user, so do not
-            // default to the account language, because the session language
-            // or the language of the current course may be different.
-            $language = current_language();
+            // Checking the authenthication method of the currently logged in user, so do not
+            // default to the account authentication, because the session authentication may be different.
+            $userauth = $USER->auth;
         } else {
-            if (is_null($userid)) {
-                // Fall back to site language or English.
-                $language = $CFG->lang ?? 'en';
-            } else {
+            if (!is_null($userid)) {
                 // Checking access for someone else than the logged in user, so
-                // use the preferred language of that user account.
-                // This language is never empty as there is a not-null constraint.
-                $language = $DB->get_field('user', 'lang', ['id' => $userid]);
+                // use the authentication of that user account.
+                // This authentication is never empty as there is a not-null constraint.
+                $userauth = $DB->get_field('user', 'auth', ['id' => $userid]);
             }
         }
-        if ($language == $this->languageid) {
+        if ($userauth == $this->auth) {
             $allow = true;
         }
         if ($not) {
@@ -139,15 +133,15 @@ class condition extends \core_availability\condition {
      * @return string Information string (for admin) about all restrictions on this item
      */
     public function get_description($full, $not, \core_availability\info $info) {
-        if ($this->languageid == '') {
+        if ($this->auth == '') {
             return '';
         }
-        $installedlangs = get_string_manager()->get_list_of_translations(false);
-        if (array_key_exists($this->languageid, $installedlangs)) {
+        $enabledauths = $this->get_enabled_auths();
+        if (array_key_exists($this->auth, $enabledauths)) {
             if ($not) {
-                return get_string('getdescriptionnot', 'availability_language', $installedlangs[$this->languageid]);
+                return get_string('getdescriptionnot', 'availability_auth', $enabledauths[$this->auth]);
             }
-            return get_string('getdescription', 'availability_language', $installedlangs[$this->languageid]);
+            return get_string('getdescription', 'availability_auth', $enabledauths[$this->auth]);
         }
         return '';
     }
@@ -159,6 +153,24 @@ class condition extends \core_availability\condition {
      * @return string Text representation of parameters
      */
     protected function get_debug_string() {
-        return $this->languageid ?? 'any';
+        return $this->auth ?? 'any';
+    }
+
+    /**
+     * Obtains an array of all enabled authentication methods.
+     *
+     * @return array List of enabled authentication methods
+     */
+    public static function get_enabled_auths() {
+        $auths = array_keys(\core_component::get_plugin_list('auth'));
+
+        $enabledauths = array();
+        foreach ($auths as $auth) {
+            if (is_enabled_auth($auth)) {
+                 $enabledauths[$auth] = get_string('pluginname', "auth_{$auth}");
+            }
+        }
+
+        return $enabledauths;
     }
 }

@@ -15,25 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the language condition.
+ * Unit tests for the auth condition.
  *
- * @package availability_language
+ * @package availability_auth
  * @copyright 2017 eWallah.net <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-use availability_language\condition;
+use availability_auth\condition;
 
 /**
- * Unit tests for the language condition.
+ * Unit tests for the auth condition.
  *
- * @package availability_language
+ * @package availability_auth
  * @copyright 2017 eWallah.net <info@eWallah.net>
+ * @copyright 2021 Roberto Pinna
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class availability_language_condition_testcase extends advanced_testcase {
+class availability_auth_condition_testcase extends advanced_testcase {
 
     /**
      * Load required classes.
@@ -45,27 +47,26 @@ class availability_language_condition_testcase extends advanced_testcase {
     }
 
     /**
-     * Tests constructing and using language condition as part of tree.
-     * @coversDefaultClass availability_language\condition
+     * Tests constructing and using auth condition as part of tree.
+     * @coversDefaultClass availability_auth\condition
      */
     public function test_in_tree() {
         global $DB;
         $this->resetAfterTest();
 
-        // Create course with language turned on and a Page.
+        // Create course with auth turned on and a Page.
         set_config('enableavailability', true);
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $user1 = $generator->create_user()->id;
-        // MDL-68333 hack when nl language is not installed.
-        $DB->set_field('user', 'lang', 'nl', ['id' => $user1]);
+        $DB->set_field('user', 'auth', 'email', ['id' => $user1]);
         $user2 = $generator->create_user()->id;
 
         $info1 = new \core_availability\mock_info($course, $user1);
         $info2 = new \core_availability\mock_info($course, $user2);
 
-        $arr1 = ['type' => 'language', 'id' => 'en'];
-        $arr2 = ['type' => 'language', 'id' => 'nl'];
+        $arr1 = ['type' => 'auth', 'id' => 'manual'];
+        $arr2 = ['type' => 'auth', 'id' => 'email'];
         $tree1 = new \core_availability\tree((object)['op' => '|', 'show' => true, 'c' => [(object)$arr1]]);
         $tree2 = new \core_availability\tree((object)['op' => '|', 'show' => true, 'c' => [(object)$arr2]]);
 
@@ -95,28 +96,27 @@ class availability_language_condition_testcase extends advanced_testcase {
 
     /**
      * Tests section availability.
-     * @covers availability_language\condition
+     * @covers availability_auth\condition
      */
     public function test_sections() {
         global $DB;
         $this->resetAfterTest();
         set_config('enableavailability', true);
-        // Create course with language turned on and a Page.
+        // Create course with auth turned on and a Page.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $user1 = $generator->create_user()->id;
-        // MDL-68333 hack when nl language is not installed.
-        $DB->set_field('user', 'lang', 'nl', ['id' => $user1]);
+        $DB->set_field('user', 'auth', 'email', ['id' => $user1]);
         $user2 = $generator->create_user()->id;
         $generator->enrol_user($user1, $course->id);
         $generator->enrol_user($user2, $course->id);
-        $cond = '{"op":"|","show":false,"c":[{"type":"language","id":"nl"}]}';
+        $cond = '{"op":"|","show":false,"c":[{"type":"auth","id":"email"}]}';
         $DB->set_field('course_sections', 'availability', $cond, ['course' => $course->id, 'section' => 0]);
-        $cond = '{"op":"|","show":true,"c":[{"type":"language","id":""}]}';
+        $cond = '{"op":"|","show":true,"c":[{"type":"auth","id":""}]}';
         $DB->set_field('course_sections', 'availability', $cond, ['course' => $course->id, 'section' => 1]);
-        $cond = '{"op":"|","show":true,"c":[{"type":"language","id":"fr"}]}';
+        $cond = '{"op":"|","show":true,"c":[{"type":"auth","id":"db"}]}';
         $DB->set_field('course_sections', 'availability', $cond, ['course' => $course->id, 'section' => 2]);
-        $cond = '{"op":"|","show":true,"c":[{"type":"language","id":"en"}]}';
+        $cond = '{"op":"|","show":true,"c":[{"type":"auth","id":"manual"}]}';
         $DB->set_field('course_sections', 'availability', $cond, ['course' => $course->id, 'section' => 3]);
         $modinfo1 = get_fast_modinfo($course, $user1);
         $modinfo2 = get_fast_modinfo($course, $user2);
@@ -132,72 +132,67 @@ class availability_language_condition_testcase extends advanced_testcase {
 
     /**
      * Tests the constructor including error conditions.
-     * @covers availability_language\condition
+     * @covers availability_auth\condition
      */
     public function test_constructor() {
         // This works with no parameters.
         $structure = (object)[];
-        $language = new condition($structure);
-        $this->assertNotEmpty($language);
-
-        // This works with custom made languages.
-        $structure->id = 'en_ar';
-        $language = new condition($structure);
-        $this->assertNotEmpty($language);
+        $auth = new condition($structure);
+        $this->assertNotEmpty($auth);
 
         // Invalid ->id.
-        $language = null;
+        $auth = null;
         $structure->id = null;
         try {
-            $language = new condition($structure);
+            $auth = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertStringContainsString('Invalid ->id for language condition', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->id for auth condition', $e->getMessage());
         }
         $structure->id = 12;
         try {
-            $language = new condition($structure);
+            $auth = new condition($structure);
             $this->fail();
         } catch (coding_exception $e) {
-            $this->assertStringContainsString('Invalid ->id for language condition', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->id for auth condition', $e->getMessage());
         }
-        $this->assertEquals(null, $language);
+        $this->assertEquals(null, $auth);
     }
 
     /**
      * Tests the save() function.
-     * @covers availability_language\condition
+     * @covers availability_auth\condition
      */
     public function test_save() {
-        $structure = (object)['id' => 'fr'];
+        $structure = (object)['id' => 'db'];
         $cond = new condition($structure);
-        $structure->type = 'language';
+        $structure->type = 'auth';
         $this->assertEqualsCanonicalizing($structure, $cond->save());
-        $this->assertEqualsCanonicalizing((object)['type' => 'language', 'id' => 'nl'], $cond->get_json('nl'));
+        $this->assertEqualsCanonicalizing((object)['type' => 'auth', 'id' => 'email'], $cond->get_json('email'));
     }
 
     /**
      * Tests the get_description and get_standalone_description functions.
-     * @covers availability_language\condition
+     * @covers availability_auth\condition
      */
     public function test_get_description() {
         $info = new \core_availability\mock_info();
-        $language = new condition((object)['type' => 'language', 'id' => '']);
-        $this->assertEquals($language->get_description(false, false, $info), '');
-        $language = new condition((object)['type' => 'language', 'id' => 'en']);
-        $desc = $language->get_description(true, false, $info);
-        $this->assertEquals('The student\'s language is English ‎(en)‎', $desc);
-        $desc = $language->get_description(true, true, $info);
-        $this->assertEquals('The student\'s language is not English ‎(en)‎', $desc);
-        $desc = $language->get_standalone_description(true, false, $info);
-        $this->assertStringContainsString('Not available unless: The student\'s language is English', $desc);
-        $result = phpunit_util::call_internal_method($language, 'get_debug_string', [], 'availability_language\condition');
+        $auth = new condition((object)['type' => 'auth', 'id' => '']);
+        $this->assertEquals($auth->get_description(false, false, $info), '');
+        $auth = new condition((object)['type' => 'auth', 'id' => 'manual']);
+        $desc = $auth->get_description(true, false, $info);
+        $this->assertEquals('The user\'s auth is Manual', $desc);
+        $desc = $auth->get_description(true, true, $info);
+        $this->assertEquals('The user\'s auth is not Manual ‎(manual)‎', $desc);
+        $desc = $auth->get_standalone_description(true, false, $info);
+        $this->assertStringContainsString('Not available unless: The user\'s auth is Manual', $desc);
+        $result = phpunit_util::call_internal_method($auth, 'get_debug_string', [], 'availability_auth\condition');
         $this->assertEquals('en', $result);
     }
 
     /**
-     * Tests using language condition in front end.
-     * @coversDefaultClass availability_language\frontend
+     * Tests using auth condition in front end.
+     * @coversDefaultClass availability_auth\frontend
      */
     public function test_frontend() {
         global $CFG;
@@ -214,30 +209,22 @@ class availability_language_condition_testcase extends advanced_testcase {
         $sections = $modinfo->get_section_info_all();
         $generator->enrol_user($user->id, $course->id);
 
-        $name = 'availability_language\frontend';
-        $frontend = new \availability_language\frontend();
-        // There is only 1 language installed, so we cannot assert allow add will return true.
-        $this->assertCount(1, get_string_manager()->get_list_of_translations(true));
+        $name = 'availability_auth\frontend';
+        $frontend = new \availability_auth\frontend();
+        // There is only 1 auth enabled, so we cannot assert allow add will return true.
+        $this->assertCount(1, \core_availability\condition::get_enabled_auths());
         $this->assertCount(1, phpunit_util::call_internal_method($frontend, 'get_javascript_init_params', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, null], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, $sections[1]], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[0]], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[1]], $name));
-        $course = $generator->create_course(['lang' => 'nl']);
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, $sections[1]], $name));
-
-        $tmpdir = realpath($CFG->phpunit_dataroot);
-        mkdir($tmpdir . '/lang', $CFG->directorypermissions, true);
-        mkdir($tmpdir . '/lang/nl', $CFG->directorypermissions, true);
-        $this->assertCount(1, get_string_manager()->get_list_of_translations(true));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, $sections[1]], $name));
     }
 
 
     /**
-     * Tests using language condition in back end.
-     * @coversDefaultClass availability_language\condition
+     * Tests using auth condition in back end.
+     * @coversDefaultClass availability_auth\condition
      */
     public function test_backend() {
         global $CFG, $DB;
@@ -250,11 +237,11 @@ class availability_language_condition_testcase extends advanced_testcase {
         $user = $generator->create_user();
         $generator->enrol_user($user->id, $course->id);
         $pagegen = $generator->get_plugin_generator('mod_page');
-        $restriction = \core_availability\tree::get_root_json([condition::get_json('fr')]);
+        $restriction = \core_availability\tree::get_root_json([condition::get_json('db')]);
         $pagegen->create_instance(['course' => $course, 'availability' => json_encode($restriction)]);
-        $restriction = \core_availability\tree::get_root_json([condition::get_json('en')]);
+        $restriction = \core_availability\tree::get_root_json([condition::get_json('manual')]);
         $pagegen->create_instance(['course' => $course, 'availability' => json_encode($restriction)]);
-        $restriction = \core_availability\tree::get_root_json([condition::get_json('nl')]);
+        $restriction = \core_availability\tree::get_root_json([condition::get_json('email')]);
         $pagegen->create_instance(['course' => $course, 'availability' => json_encode($restriction)]);
         rebuild_course_cache($course->id, true);
         $mpage = new moodle_page();
@@ -273,9 +260,9 @@ class availability_language_condition_testcase extends advanced_testcase {
             echo $renderer->print_multiple_section_page($course, null, null, null, null);
         }
         $out = ob_get_clean();
-        $this->assertStringContainsString('Not available unless: The student\'s language is English ‎(en)', $out);
-        // MDL-68333 hack when nl language is not installed.
-        $DB->set_field('user', 'lang', 'fr', ['id' => $user->id]);
+        $this->assertStringContainsString('Not available unless: The user\'s auth is Manual', $out);
+        // MDL-68333 hack when nl auth is not installed.
+        $DB->set_field('user', 'auth', 'db', ['id' => $user->id]);
         $this->setuser($user);
         rebuild_course_cache($course->id, true);
         ob_start();
@@ -285,6 +272,6 @@ class availability_language_condition_testcase extends advanced_testcase {
             echo $renderer->print_multiple_section_page($course, null, null, null, null);
         }
         $out = ob_get_clean();
-        $this->assertStringNotContainsString('Not available unless: The student\'s language is English ‎(en)', $out);
+        $this->assertStringNotContainsString('Not available unless: The user\'s auth is Manual', $out);
     }
 }
