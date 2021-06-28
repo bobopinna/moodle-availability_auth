@@ -17,16 +17,17 @@
 /**
  * Language strings.
  *
- * @package   availability_language
+ * @package availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021 Roberto Pinna
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['description'] = 'Require students to use a certain language.';
-$string['getdescription'] = 'The student\'s language is {$a}';
-$string['getdescriptionnot'] = 'The student\'s language is not {$a}';
-$string['missing'] = 'You must select a language.';
-$string['pluginname'] = 'Restriction by language';
-$string['privacy:metadata'] = 'The availability_language plugin does not store any personal data.';
-$string['title'] = 'Language';
+$string['description'] = 'Limit access to users that authenticate with or without a specified method.';
+$string['getdescription'] = 'The user\'s authentication is {$a}';
+$string['getdescriptionnot'] = 'The user\'s authentication is not {$a}';
+$string['missing'] = 'You must select an authentication method.';
+$string['pluginname'] = 'Restriction by authentication';
+$string['privacy:metadata'] = 'The availability_auth plugin does not store any personal data.';
+$string['title'] = 'Authentication';

@@ -17,21 +17,23 @@
 /**
  * Privacy main class.
  *
- * @package   availability_language
+ * @package availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021 Roberto Pinna
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace availability_language\privacy;
+namespace availability_auth\privacy;
 
 /**
  * Privacy main class.
  *
- * @package   availability_language
+ * @package availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021 Roberto Pinna
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\null_provider {
 

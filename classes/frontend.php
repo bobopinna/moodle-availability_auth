@@ -17,28 +17,30 @@
 /**
  * Front-end class.
  *
- * @package   availability_language
+ * @package availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021 Roberto Pinna
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace availability_language;
+namespace availability_auth;
 
 /**
  * Front-end class.
  *
- * @package   availability_language
+ * @package availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @copyright 2021 Roberto Pinna
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class frontend extends \core_availability\frontend {
 
     /**
      * Additional parameters for the plugin's initInner function.
      *
-     * Returns an array of array of id, name of languages.
+     * Returns an array of array of id, name of authentiaction methodss.
      *
      * @param stdClass $course Course object
      * @param cm_info $cm Course-module currently being edited (null if none)
@@ -46,13 +48,11 @@ class frontend extends \core_availability\frontend {
      * @return array Array of parameters for the JavaScript function
      */
     protected function get_javascript_init_params($course, \cm_info $cm = null, \section_info $section = null) {
-        return [self::convert_associative_array_for_js(get_string_manager()->get_list_of_translations(false), 'id', 'name')];
+        return [self::convert_associative_array_for_js(\availability_auth\condition::get_enabled_auths(), 'id', 'name')];
     }
 
     /**
-     * Language condition should be available if
-     *     the course language is not forced, or
-     *     more than language is installed.
+     * Authentication condition should be available if more than one authentication methods is enabled.
      *
      * @param stdClass $course Course object
      * @param cm_info $cm Course-module currently being edited (null if none)
@@ -60,11 +60,7 @@ class frontend extends \core_availability\frontend {
      * @return bool True if available
      */
     protected function allow_add($course, \cm_info $cm = null, \section_info $section = null) {
-        // If forced course language.
-        if ($course->lang != '') {
-            return false;
-        }
-        // If there is only one language installed.
-        return count(get_string_manager()->get_list_of_translations(false)) > 1;
+        // If there is only one authentication method enabled.
+        return count(\availability_auth\condition::get_enabled_auths()) > 1;
     }
 }

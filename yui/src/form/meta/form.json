@@ -1,5 +1,5 @@
 {
-  "moodle-availability_language-form": {
+  "moodle-availability_auth-form": {
     "requires": [
         "base",
         "node",
