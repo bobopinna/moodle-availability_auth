@@ -100,7 +100,7 @@ class condition extends \core_availability\condition {
 
         $allow = false;
         $userauth = 'manual';
-        if ($userid == $USER->id) {
+        if (($userid == $USER->id) && isset($USER->auth)) {
             // Checking the authenthication method of the currently logged in user, so do not
             // default to the account authentication, because the session authentication may be different.
             $userauth = $USER->auth;
