@@ -15,11 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the language condition.
+ * Unit tests for the authentication condition.
  *
- * @package   availability_language
+ * @package   availability_auth
  * @copyright 2022 eWallah.net
  * @author    Renaat Debleu <info@eWallah.net>
+ * @copyright 2022 Roberto Pinna
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
