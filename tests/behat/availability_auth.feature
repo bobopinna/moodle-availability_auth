@@ -71,7 +71,7 @@ Feature: availability_auth modules
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Authentication" "button"
-    And I set the field "Authentication" to "en"
+    And I set the field "Authentication" to "manual"
     And I click on "Save and return to course" "button"
 
     # Page P6 for Email authenticated users hidden in section 0.
@@ -79,7 +79,7 @@ Feature: availability_auth modules
     And I expand all fieldsets
     And I click on "Add restriction..." "button"
     And I click on "Authentication" "button"
-    And I set the field "Authentication" to "en_ar"
+    And I set the field "Authentication" to "email"
     And I click on "Save and return to course" "button"
     And I log out
 

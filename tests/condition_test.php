@@ -64,8 +64,8 @@ class condition_test extends \advanced_testcase {
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
         $user1 = $generator->create_user()->id;
-        $DB->set_field('user', 'auth', 'email', ['id' => $user1]);
         $user2 = $generator->create_user()->id;
+        $DB->set_field('user', 'auth', 'email', ['id' => $user2]);
 
         $info1 = new mock_info($course, $user1);
         $info2 = new mock_info($course, $user2);
@@ -151,13 +151,13 @@ class condition_test extends \advanced_testcase {
         try {
             $auth = new condition($structure);
         } catch (\coding_exception $e) {
-            $this->assertStringContainsString('Invalid ->id for auth condition', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->id for authentication condition', $e->getMessage());
         }
         $structure->id = 12;
         try {
             $auth = new condition($structure);
         } catch (\coding_exception $e) {
-            $this->assertStringContainsString('Invalid ->id for auth condition', $e->getMessage());
+            $this->assertStringContainsString('Invalid ->id for authentication condition', $e->getMessage());
         }
         $this->assertEquals(null, $auth);
     }
@@ -184,7 +184,7 @@ class condition_test extends \advanced_testcase {
         $this->assertEquals($auth->get_description(false, false, $info), '');
         $auth = new condition((object)['type' => 'auth', 'id' => 'manual']);
         $desc = $auth->get_description(true, false, $info);
-        $this->assertEquals('The user\'s auth is Manual', $desc);
+        $this->assertEquals('The user\'s authentication is Manual accounts', $desc);
         $desc = $auth->get_description(true, true, $info);
         $this->assertEquals('The user\'s auth is not Manual ‎(manual)‎', $desc);
         $desc = $auth->get_standalone_description(true, false, $info);
@@ -215,7 +215,7 @@ class condition_test extends \advanced_testcase {
         $name = 'availability_auth\frontend';
         $frontend = new \availability_auth\frontend();
         // There is only 1 auth enabled, so we cannot assert allow add will return true.
-        $this->assertCount(1, \core_availability\condition::get_enabled_auths());
+        $this->assertCount(1, \get_enabled_auths());
         $this->assertCount(1, phpunit_util::call_internal_method($frontend, 'get_javascript_init_params', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, null], $name));
