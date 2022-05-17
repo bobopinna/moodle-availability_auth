@@ -4,7 +4,8 @@ moodle-availability_auth
 Restrict access based on user authentication method.
 
 # Idea
-User profile availabilty plugin does not include authetication methods. This pluing implement it.
+User profile availabilty plugin does not include authetication methods. This plugin implement it.
+
 This plugin only pops up when there is more than 1 authentication method is used in the system 
 (obvious, we need a least 2 authentication method to restrict)
 
