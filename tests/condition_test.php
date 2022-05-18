@@ -78,26 +78,26 @@ class condition_test extends \advanced_testcase {
         // Initial check.
         $this->setAdminUser();
         $this->assertTrue($tree1->check_available(false, $info1, true, null)->is_available());
-        $this->assertTrue($tree2->check_available(false, $info2, true, null)->is_available());
+        $this->assertFalse($tree2->check_available(false, $info2, true, null)->is_available());
         $this->assertTrue($tree1->check_available(false, $info1, true, $user1)->is_available());
-        $this->assertTrue($tree2->check_available(false, $info2, true, $user2)->is_available());
+        $this->assertTrue($tree1->check_available(false, $info2, true, $user1)->is_available());
         $this->assertFalse($tree1->check_available(false, $info1, true, $user2)->is_available());
         $this->assertFalse($tree1->check_available(false, $info2, true, $user2)->is_available());
-        $this->assertFalse($tree1->check_available(false, $info2, true, $user1)->is_available());
         $this->assertFalse($tree2->check_available(false, $info2, true, $user1)->is_available());
         $this->assertFalse($tree2->check_available(false, $info1, true, $user1)->is_available());
-        $this->assertFalse($tree2->check_available(false, $info1, true, $user2)->is_available());
+        $this->assertTrue($tree2->check_available(false, $info1, true, $user2)->is_available());
+        $this->assertTrue($tree2->check_available(false, $info2, true, $user2)->is_available());
         // Change user.
         $this->setuser($user1);
         $this->assertTrue($tree1->check_available(false, $info1, true, $user1)->is_available());
-        $this->assertFalse($tree2->check_available(false, $info1, true, $user1)->is_available());
         $this->assertFalse($tree1->check_available(true, $info1, true, $user1)->is_available());
+        $this->assertFalse($tree2->check_available(false, $info1, true, $user1)->is_available());
         $this->assertTrue($tree2->check_available(true, $info1, true, $user1)->is_available());
         $this->setuser($user2);
-        $this->assertTrue($tree1->check_available(false, $info2, true, $user2)->is_available());
-        $this->assertFalse($tree2->check_available(false, $info2, true, $user2)->is_available());
-        $this->assertFalse($tree1->check_available(true, $info2, true, $user2)->is_available());
-        $this->assertTrue($tree2->check_available(true, $info2, true, $user2)->is_available());
+        $this->assertFalse($tree1->check_available(false, $info2, true, $user2)->is_available());
+        $this->assertTrue($tree1->check_available(true, $info2, true, $user2)->is_available());
+        $this->assertTrue($tree2->check_available(false, $info2, true, $user2)->is_available());
+        $this->assertFalse($tree2->check_available(true, $info2, true, $user2)->is_available());
     }
 
     /**
@@ -127,11 +127,11 @@ class condition_test extends \advanced_testcase {
         $modinfo1 = get_fast_modinfo($course, $user1);
         $modinfo2 = get_fast_modinfo($course, $user2);
         $this->assertTrue($modinfo1->get_section_info(0)->uservisible);
-        $this->assertTrue($modinfo1->get_section_info(1)->uservisible);
+        $this->assertFalse($modinfo1->get_section_info(1)->uservisible);
         $this->assertFalse($modinfo1->get_section_info(2)->uservisible);
         $this->assertFalse($modinfo1->get_section_info(3)->uservisible);
         $this->assertFalse($modinfo2->get_section_info(0)->uservisible);
-        $this->assertTrue($modinfo2->get_section_info(1)->uservisible);
+        $this->assertFalse($modinfo2->get_section_info(1)->uservisible);
         $this->assertFalse($modinfo2->get_section_info(2)->uservisible);
         $this->assertTrue($modinfo2->get_section_info(3)->uservisible);
     }
@@ -190,8 +190,8 @@ class condition_test extends \advanced_testcase {
         $this->assertEquals('The user\'s authentication is not Manual accounts', $desc);
         $desc = $auth->get_standalone_description(true, false, $info);
         $this->assertStringContainsString('Not available unless: The user\'s authentication is Manual accounts', $desc);
-        $result = phpunit_util::call_internal_method($auth, 'get_debug_string', [], 'availability_auth\condition');
-        $this->assertEquals('en', $result);
+        $result = \phpunit_util::call_internal_method($auth, 'get_debug_string', [], 'availability_auth\condition');
+        $this->assertEquals('manual', $result);
     }
 
     /**
@@ -213,16 +213,17 @@ class condition_test extends \advanced_testcase {
         $sections = $modinfo->get_section_info_all();
         $generator->enrol_user($user->id, $course->id);
 
+        $CFG->auth = 'manual';
+
         $name = 'availability_auth\frontend';
         $frontend = new \availability_auth\frontend();
-        // There is only 1 auth enabled, so we cannot assert allow add will return true.
         $this->assertCount(1, \availability_auth\condition::get_enabled_auths());
-        $this->assertCount(1, phpunit_util::call_internal_method($frontend, 'get_javascript_init_params', [$course], $name));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, null], $name));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, $sections[1]], $name));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[0]], $name));
-        $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[1]], $name));
+        $this->assertCount(1, \phpunit_util::call_internal_method($frontend, 'get_javascript_init_params', [$course], $name));
+        $this->assertFalse(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
+        $this->assertFalse(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, null], $name));
+        $this->assertFalse(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, $sections[1]], $name));
+        $this->assertFalse(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[0]], $name));
+        $this->assertFalse(\phpunit_util::call_internal_method($frontend, 'allow_add', [$course, null, $sections[1]], $name));
     }
 
 

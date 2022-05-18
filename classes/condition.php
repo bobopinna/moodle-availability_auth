@@ -163,7 +163,8 @@ class condition extends \core_availability\condition {
 
         $enabledauths = array();
         foreach ($auths as $auth) {
-            if (is_enabled_auth($auth)) {
+            // No login account can not login.
+            if (is_enabled_auth($auth) && $auth != 'nologin') {
                  $enabledauths[$auth] = get_string('pluginname', "auth_{$auth}");
             }
         }

@@ -100,7 +100,7 @@ Feature: availability_auth modules
     And I should see "P2" in the "region-main" "region"
     And I should not see "P3" in the "region-main" "region"
     And I should see "P4" in the "region-main" "region"
-    And I should see "Not available unless: The student's authentication is Manual ‎(manual)‎" in the ".availabilityinfo" "css_element"
+    And I should see "Not available unless: The user's authentication is Manual accounts" in the ".availabilityinfo" "css_element"
     And I should not see "P5" in the "region-main" "region"
     And I should see "P6" in the "region-main" "region"
 
