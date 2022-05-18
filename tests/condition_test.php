@@ -78,14 +78,15 @@ class condition_test extends \advanced_testcase {
         // Initial check.
         $this->setAdminUser();
         $this->assertTrue($tree1->check_available(false, $info1, true, null)->is_available());
-        $this->assertFalse($tree1->check_available(false, $info1, true, $user1)->is_available());
-        $this->assertTrue($tree2->check_available(false, $info1, true, $user1)->is_available());
-        $this->assertTrue($tree1->check_available(false, $info1, true, $user2)->is_available());
-        $this->assertFalse($tree2->check_available(false, $info1, true, $user2)->is_available());
+        $this->assertTrue($tree2->check_available(false, $info2, true, null)->is_available());
+        $this->assertTrue($tree1->check_available(false, $info1, true, $user1)->is_available());
+        $this->assertTrue($tree2->check_available(false, $info2, true, $user2)->is_available());
+        $this->assertFalse($tree1->check_available(false, $info1, true, $user2)->is_available());
+        $this->assertFalse($tree1->check_available(false, $info2, true, $user2)->is_available());
         $this->assertFalse($tree1->check_available(false, $info2, true, $user1)->is_available());
-        $this->assertTrue($tree2->check_available(false, $info2, true, $user1)->is_available());
-        $this->assertTrue($tree1->check_available(false, $info2, true, $user2)->is_available());
-        $this->assertFalse($tree2->check_available(false, $info2, true, $user2)->is_available());
+        $this->assertFalse($tree2->check_available(false, $info2, true, $user1)->is_available());
+        $this->assertFalse($tree2->check_available(false, $info1, true, $user1)->is_available());
+        $this->assertFalse($tree2->check_available(false, $info1, true, $user2)->is_available());
         // Change user.
         $this->setuser($user1);
         $this->assertTrue($tree1->check_available(false, $info1, true, $user1)->is_available());
@@ -186,9 +187,9 @@ class condition_test extends \advanced_testcase {
         $desc = $auth->get_description(true, false, $info);
         $this->assertEquals('The user\'s authentication is Manual accounts', $desc);
         $desc = $auth->get_description(true, true, $info);
-        $this->assertEquals('The user\'s auth is not Manual ‎(manual)‎', $desc);
+        $this->assertEquals('The user\'s authentication is not Manual accounts', $desc);
         $desc = $auth->get_standalone_description(true, false, $info);
-        $this->assertStringContainsString('Not available unless: The user\'s auth is Manual', $desc);
+        $this->assertStringContainsString('Not available unless: The user\'s authentication is Manual accounts', $desc);
         $result = phpunit_util::call_internal_method($auth, 'get_debug_string', [], 'availability_auth\condition');
         $this->assertEquals('en', $result);
     }
@@ -215,7 +216,7 @@ class condition_test extends \advanced_testcase {
         $name = 'availability_auth\frontend';
         $frontend = new \availability_auth\frontend();
         // There is only 1 auth enabled, so we cannot assert allow add will return true.
-        $this->assertCount(1, \get_enabled_auths());
+        $this->assertCount(1, \availability_auth\condition::get_enabled_auths());
         $this->assertCount(1, phpunit_util::call_internal_method($frontend, 'get_javascript_init_params', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course], $name));
         $this->assertFalse(phpunit_util::call_internal_method($frontend, 'allow_add', [$course, $cm, null], $name));
@@ -263,7 +264,7 @@ class condition_test extends \advanced_testcase {
             echo $renderer->print_multiple_section_page($course, null, null, null, null);
         }
         $out = ob_get_clean();
-        $this->assertStringContainsString('Not available unless: The user\'s auth is Manual', $out);
+        $this->assertStringContainsString('Not available unless: The user\'s authentication is Manual accounts', $out);
         // MDL-68333 hack when nl auth is not installed.
         $DB->set_field('user', 'auth', 'db', ['id' => $user->id]);
         $this->setuser($user);
@@ -275,6 +276,6 @@ class condition_test extends \advanced_testcase {
             echo $renderer->print_multiple_section_page($course, null, null, null, null);
         }
         $out = ob_get_clean();
-        $this->assertStringNotContainsString('Not available unless: The user\'s auth is Manual', $out);
+        $this->assertStringNotContainsString('Not available unless: The user\'s authentication is Manual accounts', $out);
     }
 }
