@@ -1,13 +1,14 @@
-moodle-availability_auth
+moodle-availability_auth [![Build Status](https://github.com/bobopinna/moodle-availability_auth/workflows/Tests/badge.svg)](https://github.com/bobopinna/moodle-availability_auth/actions)
 ======================================
 
 Restrict access based on user authentication method.
 
 # Idea
-User profile availabilty plugin does not include authetication methods. This plugin implement it.
+User profile availability plugin does not include authetication methods. This plugin implement it.
 
-This plugin only pops up when there is more than 1 authentication method is used in the system 
-(obvious, we need a least 2 authentication method to restrict)
+This plugin only pops up when there is more than one valid authentication method is used in the system 
+(obvious, we need a least 2 authentication method to restrict).
+"No Login" is not a valid authentication method. A user with "No Login" as authentication method can not log in to Moodle.
 
 # Conditional availability conditions
 Check the global documentation about conditional availability conditions:
@@ -41,9 +42,6 @@ We are always interested to read about your feature proposals or even get a pull
 
 # Moodle release support
 This plugin is maintained for the latest major releases of Moodle.
-
-# Status
-[![Build Status](https://github.com/bobopinna/moodle-availability_auth/workflows/Tests/badge.svg)](https://github.com/bobopinna/moodle-availability_auth/actions)
 
 # Copyright
 eWallah.net and Roberto Pinna
