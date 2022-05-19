@@ -90,7 +90,7 @@ Feature: availability_auth modules
     And I should see "P3" in the "region-main" "region"
     And I should not see "P4" in the "region-main" "region"
     And I should see "Not available unless: The user's authentication is" in the ".availabilityinfo" "css_element"
-    And I should see "email" in the ".availabilityinfo" "css_element"
+    And I should see "Email-based self-registration" in the ".availabilityinfo" "css_element"
     And I should see "P5" in the "region-main" "region"
     And I should not see "P6" in the "region-main" "region"
     And I log out
