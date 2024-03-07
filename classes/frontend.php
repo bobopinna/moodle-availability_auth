@@ -40,7 +40,7 @@ class frontend extends \core_availability\frontend {
     /**
      * Additional parameters for the plugin's initInner function.
      *
-     * Returns an array of array of id, name of authentiaction methodss.
+     * Returns an array of array of id, name of authentication methods.
      *
      * @param stdClass $course Course object
      * @param cm_info $cm Course-module currently being edited (null if none)
